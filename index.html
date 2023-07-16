@@ -44,7 +44,7 @@ formData.append('file', file);
 // 使用XMLHttpRequest上传照片到GitHub库
 var xhr = new XMLHttpRequest();
 xhr.open('POST', 'https://api.github.com/repos/bob-po/emm/contens/photo.jpg', true);
-xhr.setRequestHeader('Authorization', 'Bearer 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');
+xhr.setRequestHeader('Authorization', 'Bearer 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');
 xhr.onload = function() {
 if (xhr.status === 201) {
 console.log('照片上传成功！');
